@@ -130,8 +130,27 @@ int increment(int* c[], int* f[], int n, int ch[], int s, int t)
 /****************************************************/
 int fordfulkerson(int* c[], int* f[], int n, int s, int t)
 {
-	return(0);
-	
+    int flot_max = 0;      // Variable pour stocker le flot total
+    int ch[n];             // Tableau pour reconstruire le chemin
+    bool visite[n];        // Tableau pour savoir quels sommets ont été visités
+
+    while (true)  // Répéter tant qu’on trouve un chemin
+    {
+        // Réinitialiser les tableaux
+        for (int i = 0; i < n; i++) {
+            visite[i] = false;
+            ch[i] = -1;
+        }
+
+        if (!chaineaugmentante(c, f, n, ch, s, t, visite)) 
+            break; // Si plus de chemin possible, on s'arrête
+
+        flot_max += increment(c, f, n, ch, s, t); // Ajouter le flux du nouveau chemin
+    }
+
+    cout << "\nFlot maximum : " << flot_max << endl;
+    
+	return flot_max; // Retourner le résultat final
 }
 
 
@@ -150,9 +169,48 @@ int fordfulkerson(int* c[], int* f[], int n, int s, int t)
 /****************************************************/
 /* A FAIRE					    */
 /****************************************************/
-int couplagemax(int *ab[],int na, int nb)
+/****************************************************/
+int couplagemax(int *ab[], int na, int nb)
 {
-	return(0);
+	int n = na + nb + 2; // Total de sommets (ensemble A + B + source + puits)
+    int s = 0;           // La source (sommet 0)
+    int t = n - 1;       // Le puits (dernier sommet)
+
+    // Initialiser les matrices de capacité et de flot
+    int** c = new int*[n];
+    int** f = new int*[n];
+    for (int i = 0; i < n; i++) {
+        c[i] = new int[n]{0}; // Initialisé à 0
+        f[i] = new int[n]{0}; // Initialisé à 0
+    }
+
+    // Ajouter des arcs entre la source et chaque sommet de A
+    for (int i = 0; i < na; i++)
+        c[s][1 + i] = 1;
+
+    // Ajouter des arcs entre chaque sommet de B et le puits
+    for (int j = 0; j < nb; j++)
+        c[1 + na + j][t] = 1;
+
+    // Ajouter des arcs entre les sommets de A et B s’il y a une liaison
+    for (int i = 0; i < na; i++)
+        for (int j = 0; j < nb; j++)
+            if (ab[i][j] == 1)
+                c[1 git add utilities.cpp
+git commit -m "Implémentation complète de Ford-Fulkerson et Couplage Maximum - by Malek"
+git push
++ i][1 + na + j] = 1;
+
+    // Appeler fordfulkerson pour calculer le couplage maximum
+    int result = fordfulkerson(c, f, n, s, t);
+
+    // Libérer la mémoire
+    for (int i = 0; i < n; i++) {
+        delete[] c[i];
+        delete[] f[i];
+    }
+    delete[] c;
+    delete[] f;
+
+    return result; // Retourner le couplage maximum
 }
-
-
